@@ -27,3 +27,34 @@ resource "aws_subnet" "public-c" {
         Name = "${format("sandbox-%02d", count.index + 1)}"
     }
 }
+
+# Internet Gatewayの作成
+resource "aws_internet_gateway" "gw" {
+    vpc_id = "${aws_vpc.sample_vpc.id}"
+
+    tags {
+        Name = "${format("sandbox-%02d", count.index + 1)}"
+    }
+}
+
+# Root Tableの作成
+resource "aws_route_table" "public-route" {
+    vpc_id = "${aws_vpc.sample_vpc.id}"
+
+    route {
+        cidr_block = "0.0.0.0/0"
+        gateway_id = "${aws_internet_gateway.gw.id}"
+    }
+}
+
+# Root Tableの追加(1a)
+resource "aws_route_table_association" "public-a" {
+    route_table_id = "${aws_route_table.public-route.id}"
+    subnet_id      = "${aws_subnet.public-a.id}"
+}
+
+# Root Tableの追加(1c)
+resource "aws_route_table_association" "public-c" {
+    route_table_id = "${aws_route_table.public-route.id}"
+    subnet_id      = "${aws_subnet.public-c.id}"
+}
