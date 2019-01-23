@@ -1,9 +1,9 @@
 resource "aws_instance" "sandbox" {
-  count = 2
-  ami = "ami-0b86cfbff176b7d3a" # Ubuntu 18.04 LTS official ami
-  instance_type = "t2.micro"
+  count = "${lookup(var.ec2_config, "count")}"
+  ami = "${lookup(var.ec2_config, "ami")}"
+  instance_type = "${lookup(var.ec2_config, "instance_type")}"
 
   tags {
-    Name = "${format("modified sandbox-%02d", count.index + 1)}"
+    Name = "${format("sandbox-%02d", count.index + 1)}"
   }
 }
