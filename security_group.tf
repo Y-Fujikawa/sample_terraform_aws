@@ -1,3 +1,7 @@
+resource "aws_key_pair" "auth" {
+    key_name   = "${var.key_name}"
+    public_key = "${file(var.public_key_path)}"
+}
 resource "aws_security_group" "sample_security_group" {
     name = "sample_security_group"
     description = "sample_security_group"
