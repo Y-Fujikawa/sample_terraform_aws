@@ -1,60 +1,60 @@
 # VPCの設定
 resource "aws_vpc" "sample_vpc" {
-    cidr_block = "10.0.0.0/16"
-    instance_tenancy = "default"
+  cidr_block       = "10.0.0.0/16"
+  instance_tenancy = "default"
 
-    tags {
-        Name = "${format("sandbox-%02d", count.index + 1)}"
-    }
+  tags {
+    Name = "${format("sandbox-%02d", count.index + 1)}"
+  }
 }
 
 # Public Subnetの作成
 resource "aws_subnet" "public-a" {
-    vpc_id     = "${aws_vpc.sample_vpc.id}"
-    cidr_block = "10.0.1.0/24"
+  vpc_id     = "${aws_vpc.sample_vpc.id}"
+  cidr_block = "10.0.1.0/24"
 
-    tags {
-        Name = "${format("sandbox-%02d", count.index + 1)}"
-    }
+  tags {
+    Name = "${format("sandbox-%02d", count.index + 1)}"
+  }
 }
 
 # Public Subnetの追加
 resource "aws_subnet" "public-c" {
-    vpc_id     = "${aws_vpc.sample_vpc.id}"
-    cidr_block = "10.0.2.0/24"
+  vpc_id     = "${aws_vpc.sample_vpc.id}"
+  cidr_block = "10.0.2.0/24"
 
-    tags {
-        Name = "${format("sandbox-%02d", count.index + 1)}"
-    }
+  tags {
+    Name = "${format("sandbox-%02d", count.index + 1)}"
+  }
 }
 
 # Internet Gatewayの作成
 resource "aws_internet_gateway" "gw" {
-    vpc_id = "${aws_vpc.sample_vpc.id}"
+  vpc_id = "${aws_vpc.sample_vpc.id}"
 
-    tags {
-        Name = "${format("sandbox-%02d", count.index + 1)}"
-    }
+  tags {
+    Name = "${format("sandbox-%02d", count.index + 1)}"
+  }
 }
 
 # Root Tableの作成
 resource "aws_route_table" "public-route" {
-    vpc_id = "${aws_vpc.sample_vpc.id}"
+  vpc_id = "${aws_vpc.sample_vpc.id}"
 
-    route {
-        cidr_block = "0.0.0.0/0"
-        gateway_id = "${aws_internet_gateway.gw.id}"
-    }
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = "${aws_internet_gateway.gw.id}"
+  }
 }
 
 # Root Tableの追加(1a)
 resource "aws_route_table_association" "public-a" {
-    route_table_id = "${aws_route_table.public-route.id}"
-    subnet_id      = "${aws_subnet.public-a.id}"
+  route_table_id = "${aws_route_table.public-route.id}"
+  subnet_id      = "${aws_subnet.public-a.id}"
 }
 
 # Root Tableの追加(1c)
 resource "aws_route_table_association" "public-c" {
-    route_table_id = "${aws_route_table.public-route.id}"
-    subnet_id      = "${aws_subnet.public-c.id}"
+  route_table_id = "${aws_route_table.public-route.id}"
+  subnet_id      = "${aws_subnet.public-c.id}"
 }
