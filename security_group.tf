@@ -58,6 +58,15 @@ resource "aws_security_group" "web" {
     security_groups = ["${aws_security_group.lb.id}"]
   }
 
+  # Fargateリポジトリ以外からコンテナイメージ取得に必要
+  # https://docs.aws.amazon.com/ja_jp/AmazonECS/latest/developerguide/task_cannot_pull_image.html
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
   tags {
     Name = "${format("sandbox-%02d", count.index + 1)}"
   }

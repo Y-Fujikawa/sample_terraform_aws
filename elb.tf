@@ -18,11 +18,48 @@ resource "aws_lb" "lb" {
   }
 }
 
-resource "aws_lb_target_group" "lb" {
-  name     = "sample-lb-tg"
-  port     = 80
-  protocol = "HTTP"
-  vpc_id   = "${aws_vpc.sample_vpc.id}"
+# EC2インスタンス
+# resource "aws_lb_target_group" "lb" {
+#   name     = "sample-lb-tg"
+#   port     = 80
+#   protocol = "HTTP"
+#   vpc_id   = "${aws_vpc.sample_vpc.id}"
+
+#   health_check {
+#     interval            = 30
+#     path                = "/index.html"
+#     port                = 80
+#     protocol            = "HTTP"
+#     timeout             = 5
+#     unhealthy_threshold = 2
+#     matcher             = 200
+#   }
+# }
+
+# resource "aws_lb_target_group_attachment" "lb" {
+#   target_group_arn = "${aws_lb_target_group.lb.arn}"
+#   target_id        = "${aws_instance.sandbox.id}"
+#   port             = 80
+# }
+
+# resource "aws_lb_listener" "lb" {
+#   load_balancer_arn = "${aws_lb.lb.arn}"
+#   port              = 80
+
+#   default_action {
+#     type             = "forward"
+#     target_group_arn = "${aws_lb_target_group.lb.arn}"
+#   }
+# }
+
+# ECSインスタンス
+resource "aws_lb_target_group" "lb-ecs" {
+  name                 = "sample-lb-ecs-tg"
+  port                 = 80
+  protocol             = "HTTP"
+  vpc_id               = "${aws_vpc.sample_vpc.id}"
+  target_type          = "ip"
+  deregistration_delay = "10"
 
   health_check {
     interval            = 30
@@ -35,18 +72,12 @@ resource "aws_lb_target_group" "lb" {
   }
 }
 
-resource "aws_lb_target_group_attachment" "lb" {
-  target_group_arn = "${aws_lb_target_group.lb.arn}"
-  target_id        = "${aws_instance.sandbox.id}"
-  port             = 80
-}
-
-resource "aws_lb_listener" "lb" {
+resource "aws_lb_listener" "lb-ecs" {
   load_balancer_arn = "${aws_lb.lb.arn}"
   port              = 80
 
   default_action {
     type             = "forward"
-    target_group_arn = "${aws_lb_target_group.lb.arn}"
+    target_group_arn = "${aws_lb_target_group.lb-ecs.arn}"
   }
 }
