@@ -70,6 +70,12 @@ resource "aws_lb_target_group" "lb-ecs" {
     unhealthy_threshold = 2
     matcher             = 200
   }
+
+  # NLB指定時に必要な設定らしい？
+  # stickiness {
+  #   enabled = false
+  #   type = "lb_cookie"
+  # }
 }
 
 resource "aws_lb_listener" "lb-ecs" {

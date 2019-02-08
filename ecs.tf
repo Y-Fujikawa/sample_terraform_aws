@@ -25,11 +25,7 @@ resource "aws_ecs_service" "web-service" {
 
   network_configuration {
     security_groups = ["${aws_security_group.web.id}"]
-    subnets         = ["${aws_subnet.public-a.id}"]
-
-    # Fargateリポジトリ以外からコンテナイメージ取得に必要
-    # https://docs.aws.amazon.com/ja_jp/AmazonECS/latest/developerguide/task_cannot_pull_image.html
-    assign_public_ip = true
+    subnets         = ["${aws_subnet.private-a.id}"]
   }
 
   load_balancer {
