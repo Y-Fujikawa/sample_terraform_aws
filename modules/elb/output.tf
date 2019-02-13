@@ -1,5 +1,5 @@
 output "alb_arn" {
-  value       = "${aws_lb.this.arn}"
+  value = "${aws_lb.this.arn}"
 }
 
 output "lb_target_group_id" {
@@ -7,5 +7,5 @@ output "lb_target_group_id" {
 }
 
 output "listener_arn" {
-  value       = "${aws_lb_listener.listener.arn}"
+  value = "${aws_lb_listener.listener.arn}"
 }
