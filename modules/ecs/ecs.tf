@@ -8,7 +8,7 @@ data "aws_iam_role" "ecs_task_execution_role" {
 
 resource "aws_ecs_task_definition" "web" {
   family                   = "web"
-  container_definitions    = "${file("task/web.json")}"
+  container_definitions    = "${file("./task/container_definitions.json")}"
   network_mode             = "awsvpc"
   requires_compatibilities = ["FARGATE"]
   cpu                      = 256
@@ -24,17 +24,13 @@ resource "aws_ecs_service" "web-service" {
   launch_type     = "FARGATE"
 
   network_configuration {
-    security_groups = ["${aws_security_group.web.id}"]
-    subnets         = ["${aws_subnet.private-a.id}"]
+    security_groups = ["${var.sg_id}"]
+    subnets         = ["${var.private_subnets}"]
   }
 
   load_balancer {
-    target_group_arn = "${aws_lb_target_group.lb-ecs.id}"
+    target_group_arn = "${var.lb_target_group_id}"
     container_name   = "web"
     container_port   = 80
   }
-
-  depends_on = [
-    "aws_lb_listener.lb-ecs",
-  ]
 }
