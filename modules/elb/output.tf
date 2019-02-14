@@ -6,6 +6,6 @@ output "lb_target_group_id" {
   value = "${aws_lb_target_group.target_group.id}"
 }
 
-output "listener_arn" {
-  value = "${aws_lb_listener.listener.arn}"
+output "lb_target_group_arn" {
+  value = "${aws_lb_target_group.target_group.arn}"
 }

@@ -16,6 +16,17 @@ resource "aws_ecs_task_definition" "web" {
   execution_role_arn       = "${data.aws_iam_role.ecs_task_execution_role.arn}"
 }
 
+# ECS ServiceはLBがないと設定できないため、ここで定義する
+resource "aws_lb_listener" "listener" {
+  load_balancer_arn = "${var.alb_arn}"
+  port              = 80
+
+  default_action {
+    type             = "forward"
+    target_group_arn = "${var.lb_target_group_arn}"
+  }
+}
+
 resource "aws_ecs_service" "web-service" {
   name            = "web-service"
   cluster         = "${aws_ecs_cluster.web-cluster.id}"
@@ -33,4 +44,8 @@ resource "aws_ecs_service" "web-service" {
     container_name   = "web"
     container_port   = 80
   }
+
+  depends_on = [
+    "aws_lb_listener.listener",
+  ]
 }

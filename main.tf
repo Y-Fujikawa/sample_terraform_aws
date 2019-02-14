@@ -19,7 +19,9 @@ module "elb" {
 module "ecs" {
   source = "./modules/ecs"
 
-  sg_id              = "${module.security_group.sg_id}"
-  private_subnets    = "${module.vpc.private_subnets}"
-  lb_target_group_id = "${module.elb.lb_target_group_id}"
+  sg_id               = "${module.security_group.sg_id}"
+  private_subnets     = "${module.vpc.private_subnets}"
+  alb_arn             = "${module.elb.alb_arn}"
+  lb_target_group_id  = "${module.elb.lb_target_group_id}"
+  lb_target_group_arn = "${module.elb.lb_target_group_arn}"
 }
