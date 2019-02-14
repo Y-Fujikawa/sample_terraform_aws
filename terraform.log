@@ -1,7 +1,0 @@
-2019/02/14 11:25:13 [INFO] Terraform version: 0.11.11  
-2019/02/14 11:25:13 [INFO] Go runtime version: go1.11.4
-2019/02/14 11:25:13 [INFO] CLI args: []string{"/usr/local/Cellar/terraform/0.11.11/bin/terraform", "fmt"}
-2019/02/14 11:25:13 [DEBUG] Attempting to open CLI config file: /Users/fujikawa-yasu/.terraformrc
-2019/02/14 11:25:13 [DEBUG] File doesn't exist, but doesn't need to. Ignoring.
-2019/02/14 11:25:13 [INFO] CLI command args: []string{"fmt"}
-2019/02/14 11:25:13 [DEBUG] plugin: waiting for all plugin processes to complete...
