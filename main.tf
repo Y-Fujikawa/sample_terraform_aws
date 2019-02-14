@@ -32,3 +32,12 @@ module "ecs" {
   lb_target_group_id  = "${module.nlb.lb_target_group_id}"
   lb_target_group_arn = "${module.nlb.lb_target_group_arn}"
 }
+
+module "aurora" {
+  source = "./modules/aurora"
+
+  vpc_id          = "${module.vpc.vpc_id}"
+  vpc_cidr_block  = "${module.vpc.vpc_cidr_block}"
+  private_subnets = "${module.vpc.private_subnets}"
+  time_zone       = "Asia/Tokyo"
+}
