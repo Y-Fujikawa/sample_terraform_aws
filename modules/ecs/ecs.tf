@@ -18,7 +18,8 @@ resource "aws_ecs_task_definition" "web" {
 
 # ECS ServiceはLBがないと設定できないため、ここで定義する
 resource "aws_lb_listener" "listener" {
-  load_balancer_arn = "${var.alb_arn}"
+  load_balancer_arn = "${var.lb_arn}"
+  protocol          = "TCP"
   port              = 80
 
   default_action {

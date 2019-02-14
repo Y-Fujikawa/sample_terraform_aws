@@ -1,4 +1,4 @@
-output "alb_arn" {
+output "lb_arn" {
   value = "${aws_lb.this.arn}"
 }
 

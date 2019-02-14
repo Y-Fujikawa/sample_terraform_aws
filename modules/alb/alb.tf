@@ -36,10 +36,4 @@ resource "aws_lb_target_group" "target_group" {
     unhealthy_threshold = 2
     matcher             = 200
   }
-
-  # NLB指定時に必要な設定らしい？
-  # stickiness {
-  #   enabled = false
-  #   type = "lb_cookie"
-  # }
 }
