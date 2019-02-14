@@ -8,12 +8,23 @@ data "aws_iam_role" "ecs_task_execution_role" {
 
 resource "aws_ecs_task_definition" "web" {
   family                   = "web"
-  container_definitions    = "${file("task/web.json")}"
+  container_definitions    = "${file("./task/container_definitions.json")}"
   network_mode             = "awsvpc"
   requires_compatibilities = ["FARGATE"]
   cpu                      = 256
   memory                   = 512
   execution_role_arn       = "${data.aws_iam_role.ecs_task_execution_role.arn}"
+}
+
+# ECS ServiceはLBがないと設定できないため、ここで定義する
+resource "aws_lb_listener" "listener" {
+  load_balancer_arn = "${var.alb_arn}"
+  port              = 80
+
+  default_action {
+    type             = "forward"
+    target_group_arn = "${var.lb_target_group_arn}"
+  }
 }
 
 resource "aws_ecs_service" "web-service" {
@@ -24,17 +35,17 @@ resource "aws_ecs_service" "web-service" {
   launch_type     = "FARGATE"
 
   network_configuration {
-    security_groups = ["${aws_security_group.web.id}"]
-    subnets         = ["${aws_subnet.private-a.id}"]
+    security_groups = ["${var.sg_id}"]
+    subnets         = ["${var.private_subnets}"]
   }
 
   load_balancer {
-    target_group_arn = "${aws_lb_target_group.lb-ecs.id}"
+    target_group_arn = "${var.lb_target_group_id}"
     container_name   = "web"
     container_port   = 80
   }
 
   depends_on = [
-    "aws_lb_listener.lb-ecs",
+    "aws_lb_listener.listener",
   ]
 }
