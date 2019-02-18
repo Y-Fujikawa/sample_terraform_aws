@@ -6,25 +6,26 @@
 # コマンド
 # $ aws ssm put-parameter --name "/sample/db/name" --value sample --type String 
 # $ aws ssm put-parameter --name "/sample/db/username" --value sample --type String 
-# $ aws ssm put-parameter --name "/sample/db/password" --value sample --type String
-resource "aws_iam_role" "audit" {
-  name = "sample-rds-cluster-audit"
+# $ aws ssm put-parameter --name "/sample/db/password" --value samplesample --type String
 
-  assume_role_policy = <<EOF
+# 監査ログのためのIAMロール
+resource "aws_iam_role" "monitoring" {
+  name = "sample-rds-cluster-monitoring"
+
+  assume_role_policy = <<EOL
 {
   "Version": "2012-10-17",
   "Statement": [
     {
       "Action": "sts:AssumeRole",
       "Principal": {
-        "Service": "rds.amazonaws.com"
+        "Service": "monitoring.rds.amazonaws.com"
       },
-      "Effect": "Allow",
-      "Sid": ""
+      "Effect": "Allow"
     }
   ]
 }
-EOF
+EOL
 
   tags = {
     Name = "dev"
@@ -32,8 +33,8 @@ EOF
 }
 
 # FYI. https://dev.classmethod.jp/cloud/aws/amazon-aurora-audit-events-cloudwatch-logs/
-resource "aws_iam_policy" "audit_policy" {
-  name = "sample-aurora-audit-policy"
+resource "aws_iam_policy" "monitoring_policy" {
+  name = "sample-aurora-monitoring-policy"
 
   policy = <<EOL
 {
@@ -68,10 +69,10 @@ resource "aws_iam_policy" "audit_policy" {
 EOL
 }
 
-resource "aws_iam_policy_attachment" "attach_audit_policy" {
-  name       = "sample-attach-audit-policy"
-  roles      = ["${aws_iam_role.audit.name}"]
-  policy_arn = "${aws_iam_policy.audit_policy.arn}"
+resource "aws_iam_policy_attachment" "monitoring" {
+  name       = "sample-attach-monitoring"
+  roles      = ["${aws_iam_role.monitoring.name}"]
+  policy_arn = "${aws_iam_policy.monitoring_policy.arn}"
 }
 
 # Auroraサブネット
@@ -110,8 +111,8 @@ resource "aws_security_group" "aurora" {
 
 # Auroraパラメータグループ
 resource "aws_rds_cluster_parameter_group" "this" {
-  name        = "sample-rds-cluster-pg"
-  family      = "aurora5.6"
+  name   = "sample-rds-cluster-pg"
+  family = "aurora5.6"
 
   parameter {
     name  = "character_set_client"
@@ -171,11 +172,57 @@ resource "aws_rds_cluster_parameter_group" "this" {
 
   parameter {
     name  = "aws_default_logs_role"
-    value = "${aws_iam_role.audit.arn}"
+    value = "${aws_iam_role.monitoring.arn}"
   }
 
   parameter {
     name  = "time_zone"
     value = "${var.time_zone}"
+  }
+}
+
+data "aws_ssm_parameter" "database_name" {
+  name = "/sample/db/name"
+}
+
+data "aws_ssm_parameter" "master_username" {
+  name = "/sample/db/username"
+}
+
+data "aws_ssm_parameter" "master_password" {
+  name = "/sample/db/password"
+}
+
+resource "aws_rds_cluster" "this" {
+  cluster_identifier      = "sample-aurora-cluster"
+  engine                  = "aurora-mysql"
+  engine_version          = "5.7.12"
+  database_name           = "${data.aws_ssm_parameter.database_name.value}"
+  master_username         = "${data.aws_ssm_parameter.master_username.value}"
+  master_password         = "${data.aws_ssm_parameter.master_password.value}"
+  backup_retention_period = 5
+  preferred_backup_window = "07:00-09:00"
+  port                    = 3306
+  db_subnet_group_name    = "${aws_db_subnet_group.this.name}"
+  vpc_security_group_ids  = ["${aws_security_group.aurora.id}"]
+
+  tags = {
+    Name = "dev"
+  }
+}
+
+resource "aws_rds_cluster_instance" "this" {
+  count                = 2
+  identifier           = "sample-${count.index}"
+  cluster_identifier   = "${aws_rds_cluster.this.id}"
+  engine               = "${aws_rds_cluster.this.engine}"
+  engine_version       = "${aws_rds_cluster.this.engine_version}"
+  instance_class       = "db.t2.small"
+  db_subnet_group_name = "${aws_db_subnet_group.this.name}"
+  monitoring_role_arn  = "${aws_iam_role.monitoring.arn}"
+  monitoring_interval  = 60
+
+  tags = {
+    Name = "dev"
   }
 }
