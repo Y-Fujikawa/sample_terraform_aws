@@ -9,3 +9,5 @@ variable "lb_arn" {}
 variable "lb_target_group_id" {}
 
 variable "lb_target_group_arn" {}
+
+variable "lb_target_group_2_arn" {}

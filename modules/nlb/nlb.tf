@@ -32,3 +32,19 @@ resource "aws_lb_target_group" "target_group" {
     type    = "lb_cookie"
   }
 }
+
+# Blue/Green Deployするために必要
+resource "aws_lb_target_group" "target_group_2" {
+  name                 = "sample-lb-tg-2"
+  port                 = 80
+  protocol             = "TCP"
+  vpc_id               = "${var.vpc_id}"
+  deregistration_delay = "10"
+  target_type          = "ip"
+
+  # NLB指定時に必要な設定
+  stickiness {
+    enabled = false
+    type    = "lb_cookie"
+  }
+}

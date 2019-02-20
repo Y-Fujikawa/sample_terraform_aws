@@ -28,12 +28,25 @@ resource "aws_lb_listener" "listener" {
   }
 }
 
+# Blue/Green Deployするために必要
+resource "aws_lb_listener" "listener2" {
+  load_balancer_arn = "${var.lb_arn}"
+  protocol          = "TCP"
+  port              = 8080
+
+  default_action {
+    type             = "forward"
+    target_group_arn = "${var.lb_target_group_2_arn}"
+  }
+}
+
 resource "aws_ecs_service" "web-service" {
-  name            = "web-service"
-  cluster         = "${aws_ecs_cluster.web-cluster.id}"
-  task_definition = "${aws_ecs_task_definition.web.arn}"
-  desired_count   = 2
-  launch_type     = "FARGATE"
+  name                              = "web-service"
+  cluster                           = "${aws_ecs_cluster.web-cluster.id}"
+  task_definition                   = "${aws_ecs_task_definition.web.arn}"
+  desired_count                     = 2
+  launch_type                       = "FARGATE"
+  health_check_grace_period_seconds = 60
 
   network_configuration {
     security_groups = ["${var.sg_id}"]
@@ -44,6 +57,10 @@ resource "aws_ecs_service" "web-service" {
     target_group_arn = "${var.lb_target_group_id}"
     container_name   = "web"
     container_port   = 80
+  }
+
+  deployment_controller {
+    type = "CODE_DEPLOY"
   }
 
   depends_on = [
