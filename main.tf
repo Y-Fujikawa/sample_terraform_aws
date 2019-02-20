@@ -26,12 +26,12 @@ module "nlb" {
 module "ecs" {
   source = "./modules/ecs"
 
-  sg_id                 = "${module.security_group.sg_id}"
-  private_subnets       = "${module.vpc.private_subnets}"
-  lb_arn                = "${module.nlb.lb_arn}"
-  lb_target_group_id    = "${module.nlb.lb_target_group_id}"
-  lb_target_group_arn   = "${module.nlb.lb_target_group_arn}"
-  lb_target_group_2_arn = "${module.nlb.lb_target_group_2_arn}"
+  sg_id                     = "${module.security_group.sg_id}"
+  private_subnets           = "${module.vpc.private_subnets}"
+  lb_arn                    = "${module.nlb.lb_arn}"
+  lb_target_group_id        = "${module.nlb.lb_target_group_id}"
+  lb_target_group_blue_arn  = "${module.nlb.lb_target_group_arn}"
+  lb_target_group_green_arn = "${module.nlb.lb_target_group_2_arn}"
 }
 
 # module "aurora" {
@@ -47,7 +47,12 @@ module "ecr" {
   source = "./modules/ecr"
 }
 
-# module "code_deploy" {
-#   source = "./modules/code_deploy"
-# }
+module "code_deploy" {
+  source = "./modules/code_deploy"
 
+  lb_listener_arn            = "${module.ecs.lb_listener_arn}"
+  lb_target_group_blue_name  = "${module.nlb.lb_target_group_name}"
+  lb_target_group_green_name = "${module.nlb.lb_target_group_2_name}"
+  ecs_cluster_name           = "${module.ecs.ecs_cluster_name}"
+  ecs_service_name           = "${module.ecs.ecs_service_name}"
+}

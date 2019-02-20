@@ -24,11 +24,11 @@ resource "aws_lb_listener" "listener" {
 
   default_action {
     type             = "forward"
-    target_group_arn = "${var.lb_target_group_arn}"
+    target_group_arn = "${var.lb_target_group_blue_arn}"
   }
 }
 
-# Blue/Green Deployするために必要
+# Blue/Green Deployするためにもう1つ必要
 resource "aws_lb_listener" "listener2" {
   load_balancer_arn = "${var.lb_arn}"
   protocol          = "TCP"
@@ -36,7 +36,7 @@ resource "aws_lb_listener" "listener2" {
 
   default_action {
     type             = "forward"
-    target_group_arn = "${var.lb_target_group_2_arn}"
+    target_group_arn = "${var.lb_target_group_green_arn}"
   }
 }
 
