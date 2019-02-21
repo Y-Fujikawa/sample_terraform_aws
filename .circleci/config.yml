@@ -3,10 +3,6 @@ jobs:
   build:
     docker:
       - image: circleci/python
-    environment:
-      ASSUME_ROLE_ARN: arn:aws:iam::${AWS_ACCOUNT_ID}:role/CodeCommitPushAccess
-      CODECOMMIT_USER_NAME: ${CODECOMMIT_USER_NAME}
-      CODECOMMIT_USER_PASSWORD: ${CODECOMMIT_USER_PASSWORD}
     steps:
       - checkout
       - run: sudo pip install awscli
