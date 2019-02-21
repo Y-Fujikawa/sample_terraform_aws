@@ -17,7 +17,7 @@ jobs:
             export AWS_SECRET_ACCESS_KEY="${AWS_SECRET_ACCESS_KEY}"
             git config credential.helper '!aws codecommit credential-helper $@'
             git config credential.useHttpPath true
-            git push https://git-codecommit.${AWS_DEFAULT_REGION}.amazonaws.com/v1/repos/${ECR_REPOSITORY_NAME} master
+            git push https://git-codecommit.${AWS_DEFAULT_REGION}.amazonaws.com/v1/repos/${AWS_CODE_COMMIT_REPO_NAME} master
 workflows:
   version: 2
   build:
