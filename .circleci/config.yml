@@ -4,7 +4,6 @@ jobs:
     machine: true
     steps:
       - checkout
-      - setup_remote_docker
       - run:
           name: Setup common environment variables
           command: |
@@ -30,7 +29,6 @@ jobs:
       AWS_DEFAULT_OUTPUT: json
     steps:
       - checkout
-      - setup_remote_docker
       - attach_workspace:
           at: workspace
       - restore_cache:
