@@ -2,6 +2,6 @@ resource "aws_ecr_repository" "this" {
   name = "sample"
 
   lifecycle {
-    ignore_changes = ["name"]
+    create_before_destroy = true
   }
 }

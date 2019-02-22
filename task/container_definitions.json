@@ -1,6 +1,6 @@
 [
     {
-        "image": "YOUR_REPO",
+        "image": "nginx",
         "cpu": 256,
         "memory": 512,
         "name": "web",

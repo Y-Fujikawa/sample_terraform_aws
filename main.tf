@@ -47,10 +47,11 @@ module "ecr" {
   source = "./modules/ecr"
 }
 
-module "code_deploy" {
-  source = "./modules/code_deploy"
+module "code_pipeline" {
+  source = "./modules/code_pipeline"
 
   lb_listener_arn            = "${module.ecs.lb_listener_arn}"
+  lb_listener_2_arn          = "${module.ecs.lb_listener_2_arn}"
   lb_target_group_blue_name  = "${module.nlb.lb_target_group_name}"
   lb_target_group_green_name = "${module.nlb.lb_target_group_2_name}"
   ecs_cluster_name           = "${module.ecs.ecs_cluster_name}"

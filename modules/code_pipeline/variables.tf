@@ -1,5 +1,7 @@
 variable "lb_listener_arn" {}
 
+variable "lb_listener_2_arn" {}
+
 variable "lb_target_group_blue_name" {}
 
 variable "lb_target_group_green_name" {}
