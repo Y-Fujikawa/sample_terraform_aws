@@ -26,6 +26,10 @@ resource "aws_lb_listener" "listener" {
     type             = "forward"
     target_group_arn = "${var.lb_target_group_blue_arn}"
   }
+
+  lifecycle {
+    ignore_changes = ["aws_ecs_service.web-service.task_definition"]
+  }
 }
 
 # Blue/Green Deployするためにもう1つ必要
@@ -37,6 +41,10 @@ resource "aws_lb_listener" "listener2" {
   default_action {
     type             = "forward"
     target_group_arn = "${var.lb_target_group_green_arn}"
+  }
+
+  lifecycle {
+    ignore_changes = ["aws_ecs_service.web-service.task_definition"]
   }
 }
 
@@ -66,4 +74,8 @@ resource "aws_ecs_service" "web-service" {
   depends_on = [
     "aws_lb_listener.listener",
   ]
+
+  lifecycle {
+    ignore_changes = ["task_definition"]
+  }
 }

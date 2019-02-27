@@ -3,8 +3,8 @@ resource "aws_vpc" "this" {
   cidr_block       = "10.0.0.0/16"
   instance_tenancy = "default"
 
-  tags {
-    Name = "sample"
+  tags = {
+    Environment = "${terraform.workspace}"
   }
 }
 
@@ -14,8 +14,8 @@ resource "aws_subnet" "public-a" {
   cidr_block        = "10.0.1.0/24"
   availability_zone = "us-east-1a"
 
-  tags {
-    Name = "sample"
+  tags = {
+    Environment = "${terraform.workspace}"
   }
 }
 
@@ -24,8 +24,8 @@ resource "aws_subnet" "public-c" {
   cidr_block        = "10.0.2.0/24"
   availability_zone = "us-east-1c"
 
-  tags {
-    Name = "sample"
+  tags = {
+    Environment = "${terraform.workspace}"
   }
 }
 
@@ -35,8 +35,8 @@ resource "aws_subnet" "private-a" {
   cidr_block        = "10.0.3.0/24"
   availability_zone = "us-east-1a"
 
-  tags {
-    Name = "sample"
+  tags = {
+    Environment = "${terraform.workspace}"
   }
 }
 
@@ -46,8 +46,8 @@ resource "aws_subnet" "private-c" {
   cidr_block        = "10.0.4.0/24"
   availability_zone = "us-east-1c"
 
-  tags {
-    Name = "sample"
+  tags = {
+    Environment = "${terraform.workspace}"
   }
 }
 
@@ -55,19 +55,27 @@ resource "aws_subnet" "private-c" {
 resource "aws_internet_gateway" "gw" {
   vpc_id = "${aws_vpc.this.id}"
 
-  tags {
-    Name = "sample"
+  tags = {
+    Environment = "${terraform.workspace}"
   }
 }
 
 # NATゲートウェイのためにElastic IPを作成
 resource "aws_eip" "nat" {
   vpc = true
+
+  tags = {
+    Environment = "${terraform.workspace}"
+  }
 }
 
 resource "aws_nat_gateway" "gw" {
   allocation_id = "${aws_eip.nat.id}"
   subnet_id     = "${aws_subnet.public-a.id}"
+
+  tags = {
+    Environment = "${terraform.workspace}"
+  }
 }
 
 # Root Tableの作成
@@ -78,6 +86,10 @@ resource "aws_route_table" "public-route" {
     cidr_block = "0.0.0.0/0"
     gateway_id = "${aws_internet_gateway.gw.id}"
   }
+
+  tags = {
+    Environment = "${terraform.workspace}"
+  }
 }
 
 resource "aws_route_table" "private-route-a" {
@@ -87,6 +99,10 @@ resource "aws_route_table" "private-route-a" {
     cidr_block = "0.0.0.0/0"
     gateway_id = "${aws_nat_gateway.gw.id}"
   }
+
+  tags = {
+    Environment = "${terraform.workspace}"
+  }
 }
 
 resource "aws_route_table" "private-route-c" {
@@ -95,6 +111,10 @@ resource "aws_route_table" "private-route-c" {
   route {
     cidr_block = "0.0.0.0/0"
     gateway_id = "${aws_nat_gateway.gw.id}"
+  }
+
+  tags = {
+    Environment = "${terraform.workspace}"
   }
 }
 
