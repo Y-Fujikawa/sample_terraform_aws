@@ -1,1 +1,1 @@
-FROM httpd:alpine
+FROM nginx:alpine

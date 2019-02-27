@@ -122,7 +122,7 @@ resource "aws_codebuild_project" "this" {
   source {
     type            = "CODECOMMIT"
     location        = "${aws_codecommit_repository.this.clone_url_http}"
-    git_clone_depth = 1
+    git_clone_depth = 5
   }
 
   tags = {
@@ -179,7 +179,7 @@ resource "aws_codedeploy_deployment_group" "this" {
 
     terminate_blue_instances_on_deployment_success {
       action                           = "TERMINATE"
-      termination_wait_time_in_minutes = 5
+      termination_wait_time_in_minutes = 1
     }
   }
 
@@ -212,6 +212,9 @@ resource "aws_codedeploy_deployment_group" "this" {
       }
     }
   }
+
+  # https://github.com/terraform-providers/terraform-provider-aws/issues/7128#issuecomment-461423222
+  lifecycle { ignore_changes = ["blue_green_deployment_config"] }
 }
 
 # CodePipeline
@@ -434,6 +437,35 @@ resource "aws_codepipeline" "this" {
 
       configuration = {
         ProjectName = "${aws_codebuild_project.this.name}"
+      }
+    }
+  }
+
+  # TODO: Railsを使う前提でデプロイ前にマイグレートを実施するようにしたい
+  # stage {
+  #   name = "DB Migrate"
+  # }
+
+  stage {
+    name = "Deploy"
+
+    action {
+      name            = "Deploy"
+      category        = "Deploy"
+      owner           = "AWS"
+      provider        = "CodeDeployToECS"
+      input_artifacts = ["source", "build"]
+      version         = "1"
+
+      configuration {
+        ApplicationName                = "${aws_codedeploy_app.this.name}"
+        DeploymentGroupName            = "${aws_codedeploy_deployment_group.this.deployment_group_name}"
+        Image1ArtifactName             = "build"
+        Image1ContainerName            = "IMAGE1_NAME"
+        TaskDefinitionTemplateArtifact = "source"
+        TaskDefinitionTemplatePath     = "taskdef.json"
+        AppSpecTemplateArtifact        = "source"
+        AppSpecTemplatePath            = "appspec.yml"
       }
     }
   }

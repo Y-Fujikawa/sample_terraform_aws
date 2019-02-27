@@ -43,9 +43,10 @@ module "ecs" {
 #   time_zone       = "Asia/Tokyo"
 # }
 
-module "ecr" {
-  source = "./modules/ecr"
-}
+# TODO: lifecycleがうまく機能しないため手動作成にする
+# module "ecr" {
+#   source = "./modules/ecr"
+# }
 
 module "code_pipeline" {
   source = "./modules/code_pipeline"
