@@ -465,7 +465,7 @@ resource "aws_codepipeline" "this" {
         TaskDefinitionTemplateArtifact = "source"
         TaskDefinitionTemplatePath     = "taskdef.json"
         AppSpecTemplateArtifact        = "source"
-        AppSpecTemplatePath            = "appspec.yml"
+        AppSpecTemplatePath            = "appspec.yaml"
       }
     }
   }
