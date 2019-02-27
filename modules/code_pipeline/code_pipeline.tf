@@ -214,7 +214,9 @@ resource "aws_codedeploy_deployment_group" "this" {
   }
 
   # https://github.com/terraform-providers/terraform-provider-aws/issues/7128#issuecomment-461423222
-  lifecycle { ignore_changes = ["blue_green_deployment_config"] }
+  lifecycle {
+    ignore_changes = ["blue_green_deployment_config"]
+  }
 }
 
 # CodePipeline
