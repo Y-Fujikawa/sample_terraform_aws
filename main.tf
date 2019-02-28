@@ -1,5 +1,7 @@
 module "vpc" {
   source = "./modules/vpc"
+
+  service_name = "${var.service_name}"
 }
 
 module "security_group" {
