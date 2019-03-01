@@ -4,7 +4,7 @@ resource "aws_vpc" "this" {
   instance_tenancy = "default"
 
   tags = {
-    Environment = "${terraform.workspace}-${var.service_name}-api"
+    Environment = "${terraform.workspace}"
   }
 }
 
@@ -15,7 +15,7 @@ resource "aws_subnet" "public-a" {
   availability_zone = "us-east-1a"
 
   tags = {
-    Environment = "${terraform.workspace}-${var.service_name}-api"
+    Environment = "${terraform.workspace}"
   }
 }
 
@@ -25,7 +25,7 @@ resource "aws_subnet" "public-c" {
   availability_zone = "us-east-1c"
 
   tags = {
-    Environment = "${terraform.workspace}-${var.service_name}-api"
+    Environment = "${terraform.workspace}"
   }
 }
 
@@ -36,7 +36,7 @@ resource "aws_subnet" "private-a" {
   availability_zone = "us-east-1a"
 
   tags = {
-    Environment = "${terraform.workspace}-${var.service_name}-api"
+    Environment = "${terraform.workspace}"
   }
 }
 
@@ -47,7 +47,7 @@ resource "aws_subnet" "private-c" {
   availability_zone = "us-east-1c"
 
   tags = {
-    Environment = "${terraform.workspace}-${var.service_name}-api"
+    Environment = "${terraform.workspace}"
   }
 }
 
@@ -56,7 +56,7 @@ resource "aws_internet_gateway" "gw" {
   vpc_id = "${aws_vpc.this.id}"
 
   tags = {
-    Environment = "${terraform.workspace}-${var.service_name}-api"
+    Environment = "${terraform.workspace}"
   }
 }
 
@@ -65,7 +65,7 @@ resource "aws_eip" "nat" {
   vpc = true
 
   tags = {
-    Environment = "${terraform.workspace}-${var.service_name}-api"
+    Environment = "${terraform.workspace}"
   }
 }
 
@@ -74,7 +74,7 @@ resource "aws_nat_gateway" "gw" {
   subnet_id     = "${aws_subnet.public-a.id}"
 
   tags = {
-    Environment = "${terraform.workspace}-${var.service_name}-api"
+    Environment = "${terraform.workspace}"
   }
 }
 
@@ -88,7 +88,7 @@ resource "aws_route_table" "public-route" {
   }
 
   tags = {
-    Environment = "${terraform.workspace}-${var.service_name}-api"
+    Environment = "${terraform.workspace}"
   }
 }
 
@@ -101,7 +101,7 @@ resource "aws_route_table" "private-route-a" {
   }
 
   tags = {
-    Environment = "${terraform.workspace}-${var.service_name}-api"
+    Environment = "${terraform.workspace}"
   }
 }
 
@@ -114,7 +114,7 @@ resource "aws_route_table" "private-route-c" {
   }
 
   tags = {
-    Environment = "${terraform.workspace}-${var.service_name}-api"
+    Environment = "${terraform.workspace}"
   }
 }
 

@@ -14,7 +14,7 @@ resource "aws_lb" "this" {
   # }
 
   tags = {
-    Environment = "dev"
+    Environment = "${terraform.workspace}"
   }
 }
 
