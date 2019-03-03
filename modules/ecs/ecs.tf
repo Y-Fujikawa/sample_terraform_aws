@@ -16,11 +16,17 @@ resource "aws_ecs_task_definition" "web" {
   execution_role_arn       = "${data.aws_iam_role.ecs_task_execution_role.arn}"
 }
 
+data "aws_acm_certificate" "sample_acm" {
+  domain = "${var.domain}"
+}
+
 # ECS ServiceはLBがないと設定できないため、ここで定義する
-resource "aws_lb_listener" "listener" {
+resource "aws_lb_listener" "https_listener" {
   load_balancer_arn = "${var.lb_arn}"
-  protocol          = "TCP"
-  port              = 80
+  protocol          = "TLS"
+  port              = 443
+  ssl_policy        = "ELBSecurityPolicy-2016-08"
+  certificate_arn   = "${data.aws_acm_certificate.sample_acm.arn}"
 
   default_action {
     type             = "forward"
@@ -28,15 +34,17 @@ resource "aws_lb_listener" "listener" {
   }
 
   lifecycle {
-    ignore_changes = ["aws_ecs_service.web-service.task_definition"]
+    ignore_changes = ["aws_lb_listener.https_listener.load_balancer_arn"]
   }
 }
 
 # Blue/Green Deployするためにもう1つ必要
-resource "aws_lb_listener" "listener2" {
+resource "aws_lb_listener" "https_listener2" {
   load_balancer_arn = "${var.lb_arn}"
-  protocol          = "TCP"
-  port              = 8080
+  protocol          = "TLS"
+  port              = 8443
+  ssl_policy        = "ELBSecurityPolicy-2016-08"
+  certificate_arn   = "${data.aws_acm_certificate.sample_acm.arn}"
 
   default_action {
     type             = "forward"
@@ -44,7 +52,7 @@ resource "aws_lb_listener" "listener2" {
   }
 
   lifecycle {
-    ignore_changes = ["aws_ecs_service.web-service.task_definition"]
+    ignore_changes = ["aws_lb_listener.https_listener2.load_balancer_arn"]
   }
 }
 
@@ -72,7 +80,7 @@ resource "aws_ecs_service" "web-service" {
   }
 
   depends_on = [
-    "aws_lb_listener.listener",
+    "aws_lb_listener.https_listener",
   ]
 
   lifecycle {
