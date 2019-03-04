@@ -25,6 +25,13 @@ module "nlb" {
   public_subnets = "${module.vpc.public_subnets}"
 }
 
+module "cloudfront" {
+  source = "./modules/cloudfront"
+
+  domain   = "${var.domain}"
+  dns_name = "${module.nlb.dns_name}"
+}
+
 module "ecs" {
   source = "./modules/ecs"
 
