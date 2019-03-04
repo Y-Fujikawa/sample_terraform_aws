@@ -1,3 +1,5 @@
+variable "domain" {}
+
 variable "sg_id" {}
 
 variable "private_subnets" {

@@ -28,6 +28,7 @@ module "nlb" {
 module "ecs" {
   source = "./modules/ecs"
 
+  domain                    = "${var.domain}"
   sg_id                     = "${module.security_group.sg_id}"
   private_subnets           = "${module.vpc.private_subnets}"
   lb_arn                    = "${module.nlb.lb_arn}"
@@ -53,8 +54,8 @@ module "ecs" {
 module "code_pipeline" {
   source = "./modules/code_pipeline"
 
-  lb_listener_arn            = "${module.ecs.lb_listener_arn}"
-  lb_listener_2_arn          = "${module.ecs.lb_listener_2_arn}"
+  lb_https_listener_arn      = "${module.ecs.lb_https_listener_arn}"
+  lb_https_listener_2_arn    = "${module.ecs.lb_https_listener_2_arn}"
   lb_target_group_blue_name  = "${module.nlb.lb_target_group_name}"
   lb_target_group_green_name = "${module.nlb.lb_target_group_2_name}"
   ecs_cluster_name           = "${module.ecs.ecs_cluster_name}"
