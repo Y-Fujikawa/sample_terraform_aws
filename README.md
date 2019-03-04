@@ -15,4 +15,4 @@ Terraform練習場
     $ terraform plan
     $ terraform apply
     ```
-6. `Amazon Routes53` にELBのAレコードを設定
+6. `Amazon Routes53` にCloudFrontのAレコードを設定
