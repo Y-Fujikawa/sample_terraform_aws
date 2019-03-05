@@ -44,14 +44,16 @@ module "ecs" {
   lb_target_group_green_arn = "${module.nlb.lb_target_group_2_arn}"
 }
 
-# module "aurora" {
-#   source = "./modules/aurora"
+module "aurora" {
+  source = "./modules/aurora"
 
-#   vpc_id          = "${module.vpc.vpc_id}"
-#   vpc_cidr_block  = "${module.vpc.vpc_cidr_block}"
-#   private_subnets = "${module.vpc.private_subnets}"
-#   time_zone       = "Asia/Tokyo"
-# }
+  service_name    = "${var.service_name}"
+  vpc_id          = "${module.vpc.vpc_id}"
+  vpc_cidr_block  = "${module.vpc.vpc_cidr_block}"
+  private_subnets = "${module.vpc.private_subnets}"
+  instance_class  = "${var.instance_class}"
+  time_zone       = "${var.time_zone}"
+}
 
 # TODO: lifecycleがうまく機能しないため手動作成にする
 # module "ecr" {

@@ -12,7 +12,7 @@ Terraform練習場
 5. Terraform実行
     ```
     $ terraform init
-    $ terraform plan
-    $ terraform apply
+    $ terraform plan -var-file=terraform.tfvars
+    $ terraform apply -var-file=terraform.tfvars
     ```
 6. `Amazon Routes53` にCloudFrontのAレコードを設定
