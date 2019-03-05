@@ -10,3 +10,12 @@ variable "service_name" {
 variable "domain" {
   default = ""
 }
+
+# DB
+variable "instance_class" {
+  default = ""
+}
+
+variable "time_zone" {
+  default = "Asia/Tokyo"
+}

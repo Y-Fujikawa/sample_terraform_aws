@@ -61,7 +61,7 @@ resource "aws_cloudfront_distribution" "this" {
   }
 
   logging_config {
-    bucket          = "${aws_s3_bucket.this.bucket_domain_name}"
+    bucket = "${aws_s3_bucket.this.bucket_domain_name}"
   }
 
   tags {
