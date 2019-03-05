@@ -84,7 +84,7 @@ resource "aws_ecs_service" "web-service" {
   task_definition                   = "${aws_ecs_task_definition.web.arn}"
   desired_count                     = 2
   launch_type                       = "FARGATE"
-  health_check_grace_period_seconds = 60
+  health_check_grace_period_seconds = 300
 
   network_configuration {
     security_groups = ["${var.sg_id}"]
