@@ -11,18 +11,18 @@
                 "protocol": "tcp"
                 }
             ],
-            "essential": true
+            "essential": true,
+            "secrets": [
+                {
+                    "name": "DB_NAME",
+                    "valueFrom": "/sample/db/name"
+                }
+            ]
         }
     ],
     "requiresCompatibilities": ["FARGATE"],
     "networkMode": "awsvpc",
     "cpu": "256",
     "memory": "512",
-    "family": "web",
-    "secrets": [
-        {
-            "name": "DB_NAME",
-            "valueFrom": "/sample/db/name"
-        }
-    ]
+    "family": "web"
 }
