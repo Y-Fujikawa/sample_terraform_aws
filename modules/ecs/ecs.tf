@@ -6,6 +6,28 @@ data "aws_iam_role" "ecs_task_execution_role" {
   name = "ecsTaskExecutionRole"
 }
 
+resource "aws_iam_role_policy" "this" {
+  name = "ecs_ssm_policy"
+  role = "${data.aws_iam_role.ecs_task_execution_role.id}"
+
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "ssm:GetParameters",
+        "secretsmanager:GetSecretValue",
+        "kms:Decrypt"
+      ],
+      "Resource": "*"
+    }
+  ]
+}
+EOF
+}
+
 resource "aws_ecs_task_definition" "web" {
   family                   = "web"
   container_definitions    = "${file("./task/container_definitions.json")}"
@@ -48,7 +70,7 @@ resource "aws_lb_listener" "https_listener2" {
 
   default_action {
     type             = "forward"
-    target_group_arn = "${var.lb_target_group_green_arn}"
+    target_group_arn = "${var.lb_target_group_blue_arn}"
   }
 
   lifecycle {

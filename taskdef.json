@@ -18,5 +18,11 @@
     "networkMode": "awsvpc",
     "cpu": "256",
     "memory": "512",
-    "family": "web"
+    "family": "web",
+    "secrets": [
+        {
+            "name": "DB_NAME",
+            "valueFrom": "/sample/db/name"
+        }
+    ]
 }
