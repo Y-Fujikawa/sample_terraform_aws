@@ -207,6 +207,8 @@ resource "aws_rds_cluster" "this" {
   db_subnet_group_name            = "${aws_db_subnet_group.this.name}"
   vpc_security_group_ids          = ["${aws_security_group.aurora.id}"]
   db_cluster_parameter_group_name = "${aws_rds_cluster_parameter_group.this.name}"
+  final_snapshot_identifier       = "${var.service_name}-final-snapshot-${md5(timestamp())}"
+  skip_final_snapshot             = true
 
   tags = {
     Environment = "${terraform.workspace}"
