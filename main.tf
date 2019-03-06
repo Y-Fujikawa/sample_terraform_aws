@@ -1,3 +1,16 @@
+provider "aws" {
+  region  = "${var.region}"
+  version = "~> 2.0"
+}
+
+terraform {
+  # tfstateをローカルマシンで管理する場合、こちらを使う
+  # その際「terraform init -reconfigure」を実行する
+  # backend "local" {}
+
+  backend "s3" {}
+}
+
 module "vpc" {
   source = "./modules/vpc"
 
