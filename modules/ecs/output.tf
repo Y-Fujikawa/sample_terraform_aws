@@ -13,3 +13,7 @@ output "ecs_cluster_name" {
 output "ecs_service_name" {
   value = "${aws_ecs_service.web-service.name}"
 }
+
+output "ecs_service_name_migrate" {
+  value = "${aws_ecs_service.migrate-service.name}"
+}

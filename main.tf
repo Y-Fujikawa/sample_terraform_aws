@@ -82,4 +82,5 @@ module "code_pipeline" {
   lb_target_group_green_name = "${module.nlb.lb_target_group_2_name}"
   ecs_cluster_name           = "${module.ecs.ecs_cluster_name}"
   ecs_service_name           = "${module.ecs.ecs_service_name}"
+  ecs_service_name_migrate   = "${module.ecs.ecs_service_name_migrate}"
 }

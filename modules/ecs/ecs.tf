@@ -127,9 +127,9 @@ resource "aws_ecs_service" "migrate-service" {
   name                              = "migrate-service"
   cluster                           = "${aws_ecs_cluster.web-cluster.id}"
   task_definition                   = "${aws_ecs_task_definition.migrate.arn}"
-  desired_count                     = 1
+  desired_count                     = 0
   launch_type                       = "FARGATE"
-  health_check_grace_period_seconds = 10
+  health_check_grace_period_seconds = 0
 
   network_configuration {
     security_groups = ["${var.sg_id}"]
@@ -138,7 +138,7 @@ resource "aws_ecs_service" "migrate-service" {
 
   load_balancer {
     target_group_arn = "${var.lb_target_group_id}"
-    container_name   = "web"
+    container_name   = "migrate"
     container_port   = 80
   }
 

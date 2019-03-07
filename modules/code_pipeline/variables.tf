@@ -9,3 +9,5 @@ variable "lb_target_group_green_name" {}
 variable "ecs_cluster_name" {}
 
 variable "ecs_service_name" {}
+
+variable "ecs_service_name_migrate" {}
