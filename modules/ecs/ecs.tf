@@ -56,7 +56,7 @@ resource "aws_lb_listener" "https_listener" {
   }
 
   lifecycle {
-    ignore_changes = ["aws_lb_listener.https_listener.load_balancer_arn"]
+    ignore_changes = ["default_action"]
   }
 }
 
@@ -74,10 +74,11 @@ resource "aws_lb_listener" "https_listener2" {
   }
 
   lifecycle {
-    ignore_changes = ["aws_lb_listener.https_listener2.load_balancer_arn"]
+    ignore_changes = ["default_action"]
   }
 }
 
+# Web
 resource "aws_ecs_service" "web-service" {
   name                              = "web-service"
   cluster                           = "${aws_ecs_cluster.web-cluster.id}"
@@ -105,7 +106,52 @@ resource "aws_ecs_service" "web-service" {
     "aws_lb_listener.https_listener",
   ]
 
+  # FYI https://github.com/terraform-providers/terraform-provider-aws/issues/7001
   lifecycle {
-    ignore_changes = ["task_definition"]
+    ignore_changes = ["load_balancer", "task_definition"]
+  }
+}
+
+# Migrate
+resource "aws_ecs_task_definition" "migrate" {
+  family                   = "migrate"
+  container_definitions    = "${file("./task/container_definitions.json")}"
+  network_mode             = "awsvpc"
+  requires_compatibilities = ["FARGATE"]
+  cpu                      = 256
+  memory                   = 512
+  execution_role_arn       = "${data.aws_iam_role.ecs_task_execution_role.arn}"
+}
+
+resource "aws_ecs_service" "migrate-service" {
+  name                              = "migrate-service"
+  cluster                           = "${aws_ecs_cluster.web-cluster.id}"
+  task_definition                   = "${aws_ecs_task_definition.migrate.arn}"
+  desired_count                     = 1
+  launch_type                       = "FARGATE"
+  health_check_grace_period_seconds = 10
+
+  network_configuration {
+    security_groups = ["${var.sg_id}"]
+    subnets         = ["${var.private_subnets}"]
+  }
+
+  load_balancer {
+    target_group_arn = "${var.lb_target_group_id}"
+    container_name   = "web"
+    container_port   = 80
+  }
+
+  deployment_controller {
+    type = "CODE_DEPLOY"
+  }
+
+  depends_on = [
+    "aws_ecs_task_definition.migrate",
+  ]
+
+  # FYI https://github.com/terraform-providers/terraform-provider-aws/issues/7001
+  lifecycle {
+    ignore_changes = ["load_balancer", "task_definition"]
   }
 }
