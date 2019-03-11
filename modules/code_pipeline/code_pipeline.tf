@@ -95,6 +95,18 @@ resource "aws_iam_role_policy_attachment" "codebuild" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryPowerUser"
 }
 
+data "aws_ssm_parameter" "database_name" {
+  name = "/${var.service_name}/db/name"
+}
+
+data "aws_ssm_parameter" "master_username" {
+  name = "/${var.service_name}/db/username"
+}
+
+data "aws_ssm_parameter" "master_password" {
+  name = "/${var.service_name}/db/password"
+}
+
 resource "aws_codebuild_project" "this" {
   name          = "sample"
   description   = "sample_codebuild_project"
@@ -129,6 +141,31 @@ resource "aws_codebuild_project" "this" {
     environment_variable {
       "name"  = "AWS_DEFAULT_REGION"
       "value" = "${data.aws_region.current.name}"
+    }
+
+    environment_variable {
+      "name"  = "DB_HOST"
+      "value" = "${var.db_host}"
+    }
+
+    environment_variable {
+      "name"  = "DB_NAME"
+      "value" = "${data.aws_ssm_parameter.database_name.value}"
+    }
+
+    environment_variable {
+      "name"  = "DB_USERNAME"
+      "value" = "${data.aws_ssm_parameter.master_username.value}"
+    }
+
+    environment_variable {
+      "name"  = "DB_PASSWORD"
+      "value" = "${data.aws_ssm_parameter.master_password.value}"
+    }
+
+    environment_variable {
+      "name"  = "RAILS_ENV"
+      "value" = "${var.rails_env}"
     }
   }
 
@@ -181,7 +218,7 @@ resource "aws_codedeploy_app" "web" {
 resource "aws_codedeploy_deployment_group" "web" {
   app_name               = "${aws_codedeploy_app.web.name}"
   deployment_config_name = "CodeDeployDefault.ECSAllAtOnce"
-  deployment_group_name  = "sample"
+  deployment_group_name  = "web"
   service_role_arn       = "${aws_iam_role.codedeploy.arn}"
 
   auto_rollback_configuration {
@@ -231,82 +268,12 @@ resource "aws_codedeploy_deployment_group" "web" {
   }
 
   depends_on = [
-    "aws_codedeploy_app.web"
+    "aws_codedeploy_app.web",
   ]
 
   # https://github.com/terraform-providers/terraform-provider-aws/issues/7128#issuecomment-461423222
   lifecycle {
     ignore_changes = ["blue_green_deployment_config"]
-  }
-}
-
-resource "aws_codedeploy_app" "migrate" {
-  compute_platform = "ECS"
-  name             = "sample-migrate"
-
-  lifecycle {
-    ignore_changes = ["name"]
-  }
-}
-
-resource "aws_codedeploy_deployment_group" "migrate" {
-  app_name               = "${aws_codedeploy_app.migrate.name}"
-  deployment_config_name = "CodeDeployDefault.ECSAllAtOnce"
-  deployment_group_name  = "migrate"
-  service_role_arn       = "${aws_iam_role.codedeploy.arn}"
-
-  auto_rollback_configuration {
-    enabled = true
-    events  = ["DEPLOYMENT_FAILURE"]
-  }
-
-  blue_green_deployment_config {
-    deployment_ready_option {
-      action_on_timeout = "CONTINUE_DEPLOYMENT"
-    }
-
-    terminate_blue_instances_on_deployment_success {
-      action                           = "TERMINATE"
-      termination_wait_time_in_minutes = 1
-    }
-  }
-
-  deployment_style {
-    deployment_option = "WITH_TRAFFIC_CONTROL"
-    deployment_type   = "BLUE_GREEN"
-  }
-
-  ecs_service {
-    cluster_name = "${var.ecs_cluster_name}"
-    service_name = "${var.ecs_service_name_migrate}"
-  }
-
-  load_balancer_info {
-    target_group_pair_info {
-      prod_traffic_route {
-        listener_arns = ["${var.lb_https_listener_arn}"]
-      }
-
-      test_traffic_route {
-        listener_arns = ["${var.lb_https_listener_2_arn}"]
-      }
-
-      target_group {
-        name = "${var.lb_target_group_blue_name}"
-      }
-
-      target_group {
-        name = "${var.lb_target_group_green_name}"
-      }
-    }
-  }
-
-  depends_on = [
-    "aws_codedeploy_app.migrate"
-  ]
- 
-  lifecycle {
-    ignore_changes = ["ecs_service"]
   }
 }
 
@@ -535,30 +502,6 @@ resource "aws_codepipeline" "this" {
   }
 
   stage {
-    name = "Migrate"
-
-    action {
-      name            = "Migrate"
-      category        = "Deploy"
-      owner           = "AWS"
-      provider        = "CodeDeployToECS"
-      input_artifacts = ["source", "build"]
-      version         = "1"
-
-      configuration {
-        ApplicationName                = "${aws_codedeploy_app.migrate.name}"
-        DeploymentGroupName            = "${aws_codedeploy_deployment_group.migrate.deployment_group_name}"
-        Image1ArtifactName             = "build"
-        Image1ContainerName            = "IMAGE1_NAME"
-        TaskDefinitionTemplateArtifact = "source"
-        TaskDefinitionTemplatePath     = "taskdef_migrate.json"
-        AppSpecTemplateArtifact        = "source"
-        AppSpecTemplatePath            = "appspec_migrate.yaml"
-      }
-    }
-  }
-
-  stage {
     name = "Deploy"
 
     action {
@@ -575,9 +518,9 @@ resource "aws_codepipeline" "this" {
         Image1ArtifactName             = "build"
         Image1ContainerName            = "IMAGE1_NAME"
         TaskDefinitionTemplateArtifact = "source"
-        TaskDefinitionTemplatePath     = "taskdef_web.json"
+        TaskDefinitionTemplatePath     = "taskdef.json"
         AppSpecTemplateArtifact        = "source"
-        AppSpecTemplatePath            = "appspec_web.yaml"
+        AppSpecTemplatePath            = "appspec.yaml"
       }
     }
   }

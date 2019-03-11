@@ -1,3 +1,5 @@
+variable "service_name" {}
+
 variable "lb_https_listener_arn" {}
 
 variable "lb_https_listener_2_arn" {}
@@ -10,4 +12,6 @@ variable "ecs_cluster_name" {}
 
 variable "ecs_service_name" {}
 
-variable "ecs_service_name_migrate" {}
+variable "db_host" {}
+
+variable "rails_env" {}

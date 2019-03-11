@@ -18,3 +18,8 @@ variable "instance_class" {
 variable "time_zone" {
   default = "Asia/Tokyo"
 }
+
+# Rails
+variable "rails_env" {
+  default = "staging"
+}

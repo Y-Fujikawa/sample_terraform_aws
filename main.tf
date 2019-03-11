@@ -4,9 +4,7 @@ provider "aws" {
 }
 
 terraform {
-  # tfstateをローカルマシンで管理する場合、こちらを使う
-  # その際「terraform init -reconfigure」を実行する
-  # backend "local" {}
+  # tfstateをローカルマシンで管理する場合、こちらを使う  # その際「terraform init -reconfigure」を実行する  # backend "local" {}
 
   backend "s3" {}
 }
@@ -76,11 +74,13 @@ module "aurora" {
 module "code_pipeline" {
   source = "./modules/code_pipeline"
 
-  lb_https_listener_arn      = "${module.ecs.lb_https_listener_arn}"
-  lb_https_listener_2_arn    = "${module.ecs.lb_https_listener_2_arn}"
-  lb_target_group_blue_name  = "${module.nlb.lb_target_group_name}"
-  lb_target_group_green_name = "${module.nlb.lb_target_group_2_name}"
-  ecs_cluster_name           = "${module.ecs.ecs_cluster_name}"
-  ecs_service_name           = "${module.ecs.ecs_service_name}"
-  ecs_service_name_migrate   = "${module.ecs.ecs_service_name_migrate}"
+  service_name                 = "${var.service_name}"
+  lb_https_listener_arn        = "${module.ecs.lb_https_listener_arn}"
+  lb_https_listener_2_arn      = "${module.ecs.lb_https_listener_2_arn}"
+  lb_target_group_blue_name    = "${module.nlb.lb_target_group_name}"
+  lb_target_group_green_name   = "${module.nlb.lb_target_group_2_name}"
+  ecs_cluster_name             = "${module.ecs.ecs_cluster_name}"
+  ecs_service_name             = "${module.ecs.ecs_service_name}"
+  db_host                      = "${module.aurora.db_host}"
+  rails_env                    = "${var.rails_env}"
 }
