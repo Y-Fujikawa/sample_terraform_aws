@@ -57,7 +57,7 @@ resource "aws_iam_role_policy" "codebuild" {
         {
             "Effect": "Allow",
             "Resource": [
-                "arn:aws:s3:::codepipeline-sample-bucket*"
+                "arn:aws:s3:::codepipeline-${var.service_name}-bucket*"
             ],
             "Action": [
                 "s3:PutObject",
@@ -115,6 +115,12 @@ resource "aws_codebuild_project" "this" {
 
   artifacts {
     type = "NO_ARTIFACTS"
+  }
+
+  vpc_config {
+    vpc_id             = "${var.vpc_id}"
+    subnets            = ["${var.private_subnets}"]
+    security_group_ids = ["${var.db_security_group_id}"]
   }
 
   environment {
@@ -233,7 +239,7 @@ resource "aws_codedeploy_deployment_group" "web" {
 
     terminate_blue_instances_on_deployment_success {
       action                           = "TERMINATE"
-      termination_wait_time_in_minutes = 1
+      termination_wait_time_in_minutes = 20
     }
   }
 
@@ -376,36 +382,6 @@ resource "aws_iam_role_policy" "codepipeline_policy" {
         },
         {
             "Action": [
-                "opsworks:CreateDeployment",
-                "opsworks:DescribeApps",
-                "opsworks:DescribeCommands",
-                "opsworks:DescribeDeployments",
-                "opsworks:DescribeInstances",
-                "opsworks:DescribeStacks",
-                "opsworks:UpdateApp",
-                "opsworks:UpdateStack"
-            ],
-            "Resource": "*",
-            "Effect": "Allow"
-        },
-        {
-            "Action": [
-                "cloudformation:CreateStack",
-                "cloudformation:DeleteStack",
-                "cloudformation:DescribeStacks",
-                "cloudformation:UpdateStack",
-                "cloudformation:CreateChangeSet",
-                "cloudformation:DeleteChangeSet",
-                "cloudformation:DescribeChangeSet",
-                "cloudformation:ExecuteChangeSet",
-                "cloudformation:SetStackPolicy",
-                "cloudformation:ValidateTemplate"
-            ],
-            "Resource": "*",
-            "Effect": "Allow"
-        },
-        {
-            "Action": [
                 "codebuild:BatchGetBuilds",
                 "codebuild:StartBuild"
             ],
@@ -415,30 +391,11 @@ resource "aws_iam_role_policy" "codepipeline_policy" {
         {
             "Effect": "Allow",
             "Action": [
-                "devicefarm:ListProjects",
-                "devicefarm:ListDevicePools",
-                "devicefarm:GetRun",
-                "devicefarm:GetUpload",
-                "devicefarm:CreateUpload",
-                "devicefarm:ScheduleRun"
-            ],
-            "Resource": "*"
-        },
-        {
-            "Effect": "Allow",
-            "Action": [
                 "servicecatalog:ListProvisioningArtifacts",
                 "servicecatalog:CreateProvisioningArtifact",
                 "servicecatalog:DescribeProvisioningArtifact",
                 "servicecatalog:DeleteProvisioningArtifact",
                 "servicecatalog:UpdateProduct"
-            ],
-            "Resource": "*"
-        },
-        {
-            "Effect": "Allow",
-            "Action": [
-                "cloudformation:ValidateTemplate"
             ],
             "Resource": "*"
         },
