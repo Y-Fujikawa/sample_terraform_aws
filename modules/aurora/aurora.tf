@@ -224,7 +224,6 @@ resource "aws_rds_cluster_instance" "this" {
   instance_class       = "${var.instance_class}"
   db_subnet_group_name = "${aws_db_subnet_group.this.name}"
   monitoring_role_arn  = "${aws_iam_role.monitoring.arn}"
-  monitoring_interval  = 60
 
   tags = {
     Environment = "${terraform.workspace}"

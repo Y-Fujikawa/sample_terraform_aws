@@ -45,8 +45,8 @@ resource "aws_iam_role_policy" "codebuild" {
         {
             "Effect": "Allow",
             "Resource": [
-                "arn:aws:logs:us-east-1:${data.aws_caller_identity.current.account_id}:log-group:/aws/codebuild/sample-project",
-                "arn:aws:logs:us-east-1:${data.aws_caller_identity.current.account_id}:log-group:/aws/codebuild/sample-project:*"
+                "arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:/aws/codebuild/${var.service_name}-project",
+                "arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:/aws/codebuild/${var.service_name}-project:*"
             ],
             "Action": [
                 "logs:CreateLogGroup",
@@ -70,7 +70,7 @@ resource "aws_iam_role_policy" "codebuild" {
         {
             "Effect": "Allow",
             "Resource": [
-                "arn:aws:codecommit:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:sample"
+                "arn:aws:codecommit:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:${var.service_name}"
             ],
             "Action": [
                 "codecommit:GitPull"
@@ -166,7 +166,8 @@ resource "aws_codebuild_project" "this" {
 
     environment_variable {
       "name"  = "DB_PASSWORD"
-      "value" = "${data.aws_ssm_parameter.master_password.value}"
+      "value" = "${data.aws_ssm_parameter.master_password.name}"
+      "type"  = "PARAMETER_STORE"
     }
 
     environment_variable {
