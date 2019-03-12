@@ -6,7 +6,7 @@
 # コマンド
 # $ aws ssm put-parameter --name "/sample/db/name" --value sample --type String 
 # $ aws ssm put-parameter --name "/sample/db/username" --value sample --type String 
-# $ aws ssm put-parameter --name "/sample/db/password" --value samplesample --type String
+# $ aws ssm put-parameter --name "/sample/db/password" --value samplesample --type SecureString
 
 # 監査ログのためのIAMロール
 resource "aws_iam_role" "monitoring" {

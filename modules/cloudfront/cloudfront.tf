@@ -64,6 +64,10 @@ resource "aws_cloudfront_distribution" "this" {
     bucket = "${aws_s3_bucket.this.bucket_domain_name}"
   }
 
+  lifecycle {
+    ignore_changes = ["default_cache_behavior"]
+  }
+
   tags {
     Enviroment = "${terraform.workspace}"
   }

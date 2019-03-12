@@ -100,6 +100,10 @@ resource "aws_route_table" "private-route-a" {
     gateway_id = "${aws_nat_gateway.gw.id}"
   }
 
+  lifecycle {
+    ignore_changes = ["route"]
+  }
+
   tags = {
     Environment = "${terraform.workspace}"
   }
@@ -111,6 +115,10 @@ resource "aws_route_table" "private-route-c" {
   route {
     cidr_block = "0.0.0.0/0"
     gateway_id = "${aws_nat_gateway.gw.id}"
+  }
+
+  lifecycle {
+    ignore_changes = ["route"]
   }
 
   tags = {
