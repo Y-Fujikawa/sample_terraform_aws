@@ -257,11 +257,11 @@ resource "aws_codedeploy_deployment_group" "web" {
   load_balancer_info {
     target_group_pair_info {
       prod_traffic_route {
-        listener_arns = ["${var.lb_https_listener_arn}"]
+        listener_arns = ["${var.lb_https_listener_blue_arn}"]
       }
 
       test_traffic_route {
-        listener_arns = ["${var.lb_https_listener_2_arn}"]
+        listener_arns = ["${var.lb_https_listener_green_arn}"]
       }
 
       target_group {

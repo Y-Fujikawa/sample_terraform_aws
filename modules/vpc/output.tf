@@ -10,10 +10,10 @@ output "vpc_cidr_block" {
 
 output "public_subnets" {
   description = "パブリックサブネットのID一覧"
-  value       = ["${aws_subnet.public-a.*.id}", "${aws_subnet.public-c.*.id}"]
+  value       = ["${aws_subnet.public_a.*.id}", "${aws_subnet.public_c.*.id}"]
 }
 
 output "private_subnets" {
   description = "プライベートサブネットのID一覧"
-  value       = ["${aws_subnet.private-a.*.id}", "${aws_subnet.private-c.*.id}"]
+  value       = ["${aws_subnet.private_a.*.id}", "${aws_subnet.private_c.*.id}"]
 }

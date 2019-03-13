@@ -1,5 +1,5 @@
-resource "aws_ecs_cluster" "web-cluster" {
-  name = "web-cluster"
+resource "aws_ecs_cluster" "web_cluster" {
+  name = "web_cluster"
 }
 
 data "aws_iam_role" "ecs_task_execution_role" {
@@ -43,7 +43,7 @@ data "aws_acm_certificate" "sample_acm" {
 }
 
 # ECS ServiceはLBがないと設定できないため、ここで定義する
-resource "aws_lb_listener" "https_listener" {
+resource "aws_lb_listener" "https_listener_blue" {
   load_balancer_arn = "${var.lb_arn}"
   protocol          = "TLS"
   port              = 443
@@ -61,7 +61,7 @@ resource "aws_lb_listener" "https_listener" {
 }
 
 # Blue/Green Deployするためにもう1つ必要
-resource "aws_lb_listener" "https_listener2" {
+resource "aws_lb_listener" "https_listener_green" {
   load_balancer_arn = "${var.lb_arn}"
   protocol          = "TLS"
   port              = 8443
@@ -79,9 +79,9 @@ resource "aws_lb_listener" "https_listener2" {
 }
 
 # Web
-resource "aws_ecs_service" "web-service" {
-  name                              = "web-service"
-  cluster                           = "${aws_ecs_cluster.web-cluster.id}"
+resource "aws_ecs_service" "web_service" {
+  name                              = "web_service"
+  cluster                           = "${aws_ecs_cluster.web_cluster.id}"
   task_definition                   = "${aws_ecs_task_definition.web.arn}"
   desired_count                     = 2
   launch_type                       = "FARGATE"
@@ -103,7 +103,7 @@ resource "aws_ecs_service" "web-service" {
   }
 
   depends_on = [
-    "aws_lb_listener.https_listener",
+    "aws_lb_listener.https_listener_blue",
   ]
 
   # FYI https://github.com/terraform-providers/terraform-provider-aws/issues/7001

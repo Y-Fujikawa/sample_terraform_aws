@@ -18,8 +18,8 @@ resource "aws_lb" "this" {
 }
 
 # ECSインスタンス
-resource "aws_lb_target_group" "target_group" {
-  name                 = "sample-lb-tg"
+resource "aws_lb_target_group" "target_group_blue" {
+  name                 = "sample-lb-tg-blue"
   port                 = 80
   protocol             = "TCP"
   vpc_id               = "${var.vpc_id}"
@@ -34,8 +34,8 @@ resource "aws_lb_target_group" "target_group" {
 }
 
 # Blue/Green Deployするために必要
-resource "aws_lb_target_group" "target_group_2" {
-  name                 = "sample-lb-tg-2"
+resource "aws_lb_target_group" "target_group_green" {
+  name                 = "sample-lb-tg-green"
   port                 = 80
   protocol             = "TCP"
   vpc_id               = "${var.vpc_id}"

@@ -2,9 +2,9 @@ variable "service_name" {}
 
 variable "vpc_id" {}
 
-variable "lb_https_listener_arn" {}
+variable "lb_https_listener_blue_arn" {}
 
-variable "lb_https_listener_2_arn" {}
+variable "lb_https_listener_green_arn" {}
 
 variable "lb_target_group_blue_name" {}
 
