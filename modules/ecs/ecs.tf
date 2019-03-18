@@ -85,7 +85,8 @@ resource "aws_ecs_service" "web_service" {
   task_definition                   = "${aws_ecs_task_definition.web.arn}"
   desired_count                     = 2
   launch_type                       = "FARGATE"
-  health_check_grace_period_seconds = 300
+  # ヘルスチェックの猶予期間を30分間で設定
+  health_check_grace_period_seconds = 1800
 
   network_configuration {
     security_groups = ["${var.sg_id}"]
