@@ -80,11 +80,12 @@ resource "aws_lb_listener" "https_listener_green" {
 
 # Web
 resource "aws_ecs_service" "web_service" {
-  name                              = "web_service"
-  cluster                           = "${aws_ecs_cluster.web_cluster.id}"
-  task_definition                   = "${aws_ecs_task_definition.web.arn}"
-  desired_count                     = 2
-  launch_type                       = "FARGATE"
+  name            = "web_service"
+  cluster         = "${aws_ecs_cluster.web_cluster.id}"
+  task_definition = "${aws_ecs_task_definition.web.arn}"
+  desired_count   = 2
+  launch_type     = "FARGATE"
+
   # ヘルスチェックの猶予期間を30分間で設定
   health_check_grace_period_seconds = 1800
 

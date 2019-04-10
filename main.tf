@@ -9,18 +9,27 @@ terraform {
   backend "s3" {}
 }
 
+#########################
+# VPC
+#########################
 module "vpc" {
   source = "./modules/vpc"
 
   service_name = "${var.service_name}"
 }
 
+#########################
+# Security Group
+#########################
 module "security_group" {
   source = "./modules/security_group"
 
   vpc_id = "${module.vpc.vpc_id}"
 }
 
+#########################
+# Application LoadBalancer
+#########################
 # module "alb" {
 #   source = "./modules/alb"
 #
@@ -29,6 +38,9 @@ module "security_group" {
 #   sg_id          = "${module.security_group.sg_id}"
 # }
 
+#########################
+# Network LoadBalancer
+#########################
 module "nlb" {
   source = "./modules/nlb"
 
@@ -36,6 +48,9 @@ module "nlb" {
   public_subnets = "${module.vpc.public_subnets}"
 }
 
+#########################
+# Cloud Front
+#########################
 module "cloudfront" {
   source = "./modules/cloudfront"
 
@@ -43,6 +58,9 @@ module "cloudfront" {
   dns_name = "${module.nlb.dns_name}"
 }
 
+#########################
+# ECS
+#########################
 module "ecs" {
   source = "./modules/ecs"
 
@@ -55,6 +73,9 @@ module "ecs" {
   lb_target_group_green_arn = "${module.nlb.lb_target_group_green_arn}"
 }
 
+#########################
+# Aurora MySQL
+#########################
 module "aurora" {
   source = "./modules/aurora"
 
@@ -71,6 +92,9 @@ module "aurora" {
 #   source = "./modules/ecr"
 # }
 
+#########################
+# Codepipeline
+#########################
 module "code_pipeline" {
   source = "./modules/code_pipeline"
 
@@ -86,4 +110,16 @@ module "code_pipeline" {
   db_security_group_id        = "${module.aurora.db_security_group_id}"
   db_host                     = "${module.aurora.db_host}"
   rails_env                   = "${var.rails_env}"
+}
+
+#########################
+# Auto Scale Setting
+#########################
+module "auto_scale_setting" {
+  source = "./modules/auto_scale_setting"
+
+  prefix           = "${var.prefix}"
+  service_name     = "${var.service_name}"
+  ecs_cluster_name = "${module.ecs.ecs_cluster_name}"
+  ecs_service_name = "${module.ecs.ecs_service_name}"
 }
