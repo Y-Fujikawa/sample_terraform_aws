@@ -1,6 +1,6 @@
 resource "aws_security_group" "lb" {
-  name        = "sample_sg_lb"
-  description = "sample_sg_lb"
+  name        = "${terraform.workspace}_sample_sg_lb"
+  description = "${terraform.workspace}_sample_sg_lb"
   vpc_id      = "${var.vpc_id}"
 
   ingress {
@@ -23,11 +23,15 @@ resource "aws_security_group" "lb" {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
+
+  tags = {
+    Name = "${terraform.workspace}_sample_sg_lb"
+  }
 }
 
 resource "aws_security_group" "web" {
-  name        = "sample_sg_web"
-  description = "sample_sg_web"
+  name        = "${terraform.workspace}_sample_sg_web"
+  description = "${terraform.workspace}_sample_sg_web"
   vpc_id      = "${var.vpc_id}"
 
   ingress {
@@ -53,5 +57,9 @@ resource "aws_security_group" "web" {
     to_port     = 0
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "${terraform.workspace}_sample_sg_web"
   }
 }
