@@ -1,1 +1,7 @@
 domain = "sample.com"
+region  = "us-east-1" # 米国東部（バージニア北部）
+service_name = "sample"
+domain = "sample.com"
+domain_bi = "bi.sample.com"
+instance_class = "db.t2.small"
+rails_env = "production"

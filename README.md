@@ -31,6 +31,7 @@ Terraform練習場
     $ export REGION=us-east-1
     $ export BUCKET_NAME=prd-${SERVICE_NAME}-terraform-state
     $ terraform init -backend-config="bucket=${BUCKET_NAME}" -backend-config="key=terraform.tfstate" -backend-config="region=${REGION}"
+    $ terraform workspace new prd
     $ terraform plan -var-file=terraform.tfvars.${STAGE}
     $ terraform apply -var-file=terraform.tfvars.${STAGE}
     ```

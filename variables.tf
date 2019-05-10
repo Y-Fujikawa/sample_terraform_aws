@@ -10,6 +10,10 @@ variable "domain" {
   default = ""
 }
 
+variable "domain_bi" {
+  default = ""
+}
+
 # DB
 variable "instance_class" {
   default = ""
