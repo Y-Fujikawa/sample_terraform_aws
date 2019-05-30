@@ -67,6 +67,35 @@ resource "aws_lb_listener" "https_listener" {
   }
 }
 
+resource "aws_iam_role" "this" {
+  name               = "${terraform.workspace}-${var.service_name}-redash-role"
+  description        = "Exec lambda from ssm."
+  assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "ec2.amazonaws.com"
+      },
+      "Action": "sts:AssumeRole"
+    }
+ ]
+}
+EOF
+}
+
+resource "aws_iam_role_policy_attachment" "this" {
+  role       = "${aws_iam_role.this.name}"
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM"
+}
+
+resource "aws_iam_instance_profile" "redash_instance_role" {
+    name = "redash_instance_role"
+    roles = ["${aws_iam_role.this.name}"]
+}
+
 # EC2インスタンス
 resource "aws_instance" "redash" {
   # https://redash.io/help/open-source/setup
@@ -74,6 +103,7 @@ resource "aws_instance" "redash" {
   instance_type          = "t2.small"
   vpc_security_group_ids = ["${var.sg_id}"]
   subnet_id              = "${var.private_subnets[0]}"
+  iam_instance_profile   = "${aws_iam_instance_profile.redash_instance_role.name}"
 
   tags = {
     Environment = "${terraform.workspace}"

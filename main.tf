@@ -136,3 +136,13 @@ module "redash" {
   public_subnets    = "${module.vpc.public_subnets}"
   private_subnets   = "${module.vpc.private_subnets}"
 }
+
+#########################
+# SSM
+#########################
+module "ssm" {
+  source = "./modules/ssm"
+
+  service_name      = "${var.service_name}"
+  ec2_redash_name   = "${module.redash.ec2_redash_name}"
+}
