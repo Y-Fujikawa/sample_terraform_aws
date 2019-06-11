@@ -1,28 +1,6 @@
 #####################################
 # Auto Scale Setting
 #####################################
-data "aws_iam_policy_document" "autoscaling-assume-role-policy" {
-  statement {
-    actions = ["sts:AssumeRole"]
-
-    principals {
-      type        = "Service"
-      identifiers = ["application-autoscaling.amazonaws.com"]
-    }
-  }
-}
-
-resource "aws_iam_role" "ecs_autoscale_role" {
-  name               = "${terraform.workspace}-${var.service_name}-ecs-autoscale-role"
-  assume_role_policy = "${data.aws_iam_policy_document.autoscaling-assume-role-policy.json}"
-}
-
-resource "aws_iam_policy_attachment" "ecs_autoscale_role" {
-  name       = "${terraform.workspace}-${var.service_name}-ecs-autoscale-role-attachment"
-  roles      = ["${aws_iam_role.ecs_autoscale_role.name}"]
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceAutoscaleRole"
-}
-
 # CPU
 resource "aws_cloudwatch_metric_alarm" "service_cpu_sacle_out_alerm" {
   alarm_name          = "${terraform.workspace}-${var.service_name}-ECSService-CPU-Utilization-High-50"
@@ -64,7 +42,6 @@ resource "aws_appautoscaling_target" "ecs_service_target" {
   service_namespace  = "ecs"
   resource_id        = "service/${var.ecs_cluster_name}/${var.ecs_service_name}"
   scalable_dimension = "ecs:service:DesiredCount"
-  role_arn           = "${aws_iam_role.ecs_autoscale_role.arn}"
   min_capacity       = 1
   max_capacity       = 2
 }
