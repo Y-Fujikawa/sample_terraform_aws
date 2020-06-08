@@ -129,10 +129,10 @@ module "auto_scale_setting" {
 module "redash" {
   source = "./modules/redash"
 
-  service_name      = "${var.service_name}"
-  domain_bi         = "${var.domain_bi}"
-  vpc_id            = "${module.vpc.vpc_id}"
-  sg_id             = "${module.security_group.sg_id}"
-  public_subnets    = "${module.vpc.public_subnets}"
-  private_subnets   = "${module.vpc.private_subnets}"
+  service_name    = "${var.service_name}"
+  domain_bi       = "${var.domain_bi}"
+  vpc_id          = "${module.vpc.vpc_id}"
+  sg_id           = "${module.security_group.sg_id}"
+  public_subnets  = "${module.vpc.public_subnets}"
+  private_subnets = "${module.vpc.private_subnets}"
 }
