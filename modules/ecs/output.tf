@@ -7,7 +7,7 @@ output "lb_https_listener_green_arn" {
 }
 
 output "ecs_cluster_name" {
-  value = "${aws_ecs_cluster.web_cluster.name}"
+  value = "${aws_ecs_cluster.ecs_cluster.name}"
 }
 
 output "ecs_service_name" {
