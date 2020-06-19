@@ -1,4 +1,4 @@
-resource "aws_ecs_cluster" "web_cluster" {
+resource "aws_ecs_cluster" "ecs_cluster" {
   name = "web_cluster"
 }
 
@@ -38,17 +38,17 @@ resource "aws_ecs_task_definition" "web" {
   execution_role_arn       = "${data.aws_iam_role.ecs_task_execution_role.arn}"
 }
 
-data "aws_acm_certificate" "sample_acm" {
+data "aws_acm_certificate" "acm" {
   domain = "${var.domain}"
 }
 
 # ECS ServiceはLBがないと設定できないため、ここで定義する
 resource "aws_lb_listener" "https_listener_blue" {
   load_balancer_arn = "${var.lb_arn}"
-  protocol          = "TLS"
+  protocol          = "HTTPS"
   port              = 443
   ssl_policy        = "ELBSecurityPolicy-2016-08"
-  certificate_arn   = "${data.aws_acm_certificate.sample_acm.arn}"
+  certificate_arn   = "${data.aws_acm_certificate.acm.arn}"
 
   default_action {
     type             = "forward"
@@ -63,10 +63,10 @@ resource "aws_lb_listener" "https_listener_blue" {
 # Blue/Green Deployするためにもう1つ必要
 resource "aws_lb_listener" "https_listener_green" {
   load_balancer_arn = "${var.lb_arn}"
-  protocol          = "TLS"
+  protocol          = "HTTPS"
   port              = 8443
   ssl_policy        = "ELBSecurityPolicy-2016-08"
-  certificate_arn   = "${data.aws_acm_certificate.sample_acm.arn}"
+  certificate_arn   = "${data.aws_acm_certificate.acm.arn}"
 
   default_action {
     type             = "forward"
@@ -80,11 +80,12 @@ resource "aws_lb_listener" "https_listener_green" {
 
 # Web
 resource "aws_ecs_service" "web_service" {
-  name            = "web_service"
-  cluster         = "${aws_ecs_cluster.web_cluster.id}"
-  task_definition = "${aws_ecs_task_definition.web.arn}"
-  desired_count   = 2
-  launch_type     = "FARGATE"
+  name             = "web_service"
+  cluster          = "${aws_ecs_cluster.ecs_cluster.id}"
+  task_definition  = "${aws_ecs_task_definition.web.arn}"
+  desired_count    = 2
+  launch_type      = "FARGATE"
+  platform_version = "1.4.0"
 
   # ヘルスチェックの猶予期間を30分間で設定
   health_check_grace_period_seconds = 1800
